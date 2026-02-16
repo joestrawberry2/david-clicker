@@ -1,7 +1,7 @@
 import { useState, useRef, useEffect, useCallback } from "react";
 
 const NORMAL_SRC = "https://static.wikia.nocookie.net/battlefordreamisland/images/8/86/HD_David.png/revision/latest?cb=20241210131638&format=original";
-const ANGRY_SRC = "https://static.wikia.nocookie.net/battlefordreamisland/images/e/e1/Angry_David.gif/revision/latest/scale-to-width-down/1269?cb=20200422064552";
+const ANGRY_SRC = "https://static.wikia.nocookie.net/battlefordreamisland/images/e/e1/Angry_David.gif/revision/latest/scale-to-width-down/2537?cb=20200422064552";
 const AUDIO_SRC = "https://static.wikia.nocookie.net/battlefordreamisland/images/d/d2/Bfdi_angery_AW_SERIOUSLY.ogg/revision/latest?cb=20200420143938&format=original";
 
 export default function DavidClicker() {
