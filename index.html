@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>David Clicker</title>
+    <style>
+        @import url(https://db.onlinewebfonts.com/c/468c67c3a57b93870b455fc4ec30dbe1?family=Shag-Lounge);
+        @font-face {
+            font-family: "Shag-Lounge";
+            src: url("https://db.onlinewebfonts.com/t/468c67c3a57b93870b455fc4ec30dbe1.eot");
+            src: url("https://db.onlinewebfonts.com/t/468c67c3a57b93870b455fc4ec30dbe1.eot?#iefix") format("embedded-opentype"),
+                 url("https://db.onlinewebfonts.com/t/468c67c3a57b93870b455fc4ec30dbe1.woff2") format("woff2"),
+                 url("https://db.onlinewebfonts.com/t/468c67c3a57b93870b455fc4ec30dbe1.woff") format("woff"),
+                 url("https://db.onlinewebfonts.com/t/468c67c3a57b93870b455fc4ec30dbe1.ttf") format("truetype"),
+                 url("https://db.onlinewebfonts.com/t/468c67c3a57b93870b455fc4ec30dbe1.svg#Shag-Lounge") format("svg");
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            background-color: #ffffff;
+            font-family: "Shag-Lounge", sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+            overflow-x: hidden;
+            position: relative;
+        }
+        h1 {
+            font-family: "Shag-Lounge", sans-serif;
+            font-size: 56px;
+            color: #111;
+            margin-top: 30px;
+            letter-spacing: 2px;
+            text-align: center;
+        }
+        #score-container { margin-top: 16px; text-align: center; }
+        #score-label { font-family: "Shag-Lounge", sans-serif; font-size: 26px; color: #333; }
+        #score { font-family: "Shag-Lounge", sans-serif; font-size: 54px; color: #111; display: block; }
+        #david-wrapper {
+            margin-top: 24px;
+            width: 260px; height: 330px;
+            display: flex; align-items: center; justify-content: center;
+        }
+        #david {
+            width: 230px;
+            cursor: pointer;
+            user-select: none;
+            -webkit-user-drag: none;
+        }
+        #david:active { filter: brightness(0.9); }
+        .plus-label {
+            position: fixed;
+            font-family: "Shag-Lounge", sans-serif;
+            font-size: 30px;
+            color: #22bb33;
+            font-weight: bold;
+            pointer-events: none;
+            animation: floatUp 0.95s ease-out forwards;
+            text-shadow: 0 1px 4px rgba(0,0,0,0.12);
+            z-index: 9999;
+        }
+        @keyframes floatUp {
+            0%   { opacity: 1; transform: translateY(0px) scale(1); }
+            60%  { opacity: 1; transform: translateY(-55px) scale(1.12); }
+            100% { opacity: 0; transform: translateY(-95px) scale(0.85); }
+        }
+        #buttons-container { display: flex; gap: 22px; margin-top: 26px; }
+        .boost-btn {
+            font-family: "Shag-Lounge", sans-serif;
+            font-size: 21px;
+            background: #22bb33;
+            color: #fff;
+            border: none;
+            border-radius: 14px;
+            padding: 13px 26px;
+            cursor: pointer;
+            box-shadow: 0 4px 0 #167a20;
+            transition: transform 0.08s, box-shadow 0.08s;
+            letter-spacing: 1px;
+            line-height: 1.4;
+            text-align: center;
+            outline: none;
+        }
+        .boost-btn:hover { background: #1ea82d; }
+        .boost-btn:active { transform: translateY(3px); box-shadow: 0 1px 0 #167a20; }
+        #credits {
+            margin-top: auto;
+            padding: 24px 0 18px;
+            font-family: "Shag-Lounge", sans-serif;
+            font-size: 14px;
+            color: #999;
+            text-align: center;
+        }
+        #credits strong { color: #555; }
+        #credits span { color: #22bb33; }
+    </style>
+</head>
+<body>
+
+    <h1>David Clicker</h1>
+
+    <div id="score-container">
+        <span id="score-label">Clicks:</span>
+        <span id="score">0</span>
+    </div>
+
+    <div id="david-wrapper">
+        <img id="david"
+            src="https://static.wikia.nocookie.net/battlefordreamisland/images/8/86/HD_David.png/revision/latest?cb=20241210131638&format=original"
+            alt="David from BFDI" draggable="false" />
+    </div>
+
+    <div id="buttons-container">
+        <button class="boost-btn" id="super-btn">
+            Super Click<br><span style="font-size:15px;">+50 clicks</span>
+        </button>
+        <button class="boost-btn" id="mega-btn">
+            Mega Click<br><span style="font-size:15px;">+200 clicks</span>
+        </button>
+    </div>
+
+    <div id="credits">
+        David is a character from <strong>Battle for Dream Island (BFDI)</strong><br>
+        Created by <strong>Michael Huang &amp; Cary Huang</strong>
+        <span>(jacknjellify)</span>
+    </div>
+
+    <audio id="aw-seriously" preload="auto">
+        <source src="https://static.wikia.nocookie.net/battlefordreamisland/images/d/d2/Bfdi_angery_AW_SERIOUSLY.ogg/revision/latest?cb=20200420143938&format=original" type="audio/ogg">
+    </audio>
+
+    <script>
+        let score = 0;
+        let isAngry = false;
+
+        const davidImg = document.getElementById('david');
+        const scoreEl  = document.getElementById('score');
+        const audio    = document.getElementById('aw-seriously');
+        const superBtn = document.getElementById('super-btn');
+        const megaBtn  = document.getElementById('mega-btn');
+
+        const normalSrc = "https://static.wikia.nocookie.net/battlefordreamisland/images/8/86/HD_David.png/revision/latest?cb=20241210131638&format=original";
+        const angrySrc  = "https://static.wikia.nocookie.net/battlefordreamisland/images/e/e1/Angry_David.gif/revision/latest/scale-to-width-down/2537?cb=20200422064552";
+
+        function updateScore(n) {
+            score += n;
+            scoreEl.textContent = score.toLocaleString();
+        }
+
+        function spawnLabel(x, y, text) {
+            const el = document.createElement('div');
+            el.className = 'plus-label';
+            el.textContent = text;
+            el.style.left = (x - 20) + 'px';
+            el.style.top  = (y - 20) + 'px';
+            document.body.appendChild(el);
+            el.addEventListener('animationend', () => el.remove());
+        }
+
+        function goAngry() {
+            isAngry = true;
+            davidImg.src = angrySrc;
+            audio.pause();
+            audio.currentTime = 0;
+            audio.play();
+            audio.onended = () => {
+                isAngry = false;
+                davidImg.src = normalSrc;
+            };
+        }
+
+        davidImg.addEventListener('click', function(e) {
+            updateScore(1);
+            spawnLabel(e.clientX, e.clientY, '+1');
+            goAngry();
+        });
+
+        superBtn.addEventListener('click', function(e) {
+            updateScore(50);
+            const r = superBtn.getBoundingClientRect();
+            const cx = r.left + r.width / 2, cy = r.top;
+            for (let i = 0; i < 6; i++) setTimeout(() => {
+                spawnLabel(cx + (Math.random()-.5)*130, cy + (Math.random()-.5)*30, '+50');
+            }, i * 35);
+            goAngry();
+        });
+
+        megaBtn.addEventListener('click', function(e) {
+            updateScore(200);
+            const r = megaBtn.getBoundingClientRect();
+            const cx = r.left + r.width / 2, cy = r.top;
+            for (let i = 0; i < 10; i++) setTimeout(() => {
+                spawnLabel(cx + (Math.random()-.5)*160, cy + (Math.random()-.5)*40, '+200');
+            }, i * 30);
+            goAngry();
+        });
+    </script>
+</body>
+</html>
